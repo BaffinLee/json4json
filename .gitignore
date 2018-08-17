@@ -3,3 +3,5 @@ package-lock.json
 yarn.lock
 .vscode/
 *.log
+.nyc_output/
+coverage.lcov
