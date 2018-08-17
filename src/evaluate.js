@@ -1,10 +1,9 @@
 /**
  * evaluate javascript expression in context
  * @param {string} expression javascript expression
- * @param {Context} ctx context
+ * @param {object} context context
  */
-function evaluate (expression, ctx) {
-  const context = ctx.get()
+function evaluate (expression, context) {
   const func = new Function('context', `with(context){ return ${expression} }`) // eslint-disable-line no-new-func
   return func(context)
 }
