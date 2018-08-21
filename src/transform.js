@@ -1,16 +1,20 @@
 const Context = require('./context')
 const render = require('./render')
+const defaultOptions = {
+  onError () {}
+}
 
 /**
  * transform json template with data
- * @param {object} template template
- * @param {object} data data
- * @param {object} options options
+ * @param {string|object} template template
+ * @param {object} [data] data
+ * @param {object} [options] options
+ * @param {function} [options.onError] error handler
  */
 function transform (template, data = {}, options = {}) {
-  if (template === null || typeof template !== 'object') throw new Error('template should be json object')
   const ctx = new Context(Object.assign({ $root: data }, data))
-  return render(template, options, [], ctx)
+  const opts = Object.assign({}, defaultOptions, options)
+  return render(template, opts, [], ctx)
 }
 
 module.exports = transform

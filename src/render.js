@@ -20,10 +20,10 @@ const renderers = {
       const res = evaluate(tplInfo.expression, context)
       // drop optional value
       if (tplInfo.optional && !res) return dropOptionalValue
-      // to string
-      return Object.prototype.toString.call(res)
+
+      return res
     } catch (e) {
-      if (options.onError) options.onError(e.message, path, context)
+      options.onError(e.message, path, context)
       // return template itself if error
       return template
     }
@@ -46,7 +46,7 @@ const renderers = {
       try {
         return !!evaluate(expression, context)
       } catch (e) {
-        if (options.onError) options.onError(e.message, path, context)
+        options.onError(e.message, path, context)
         return false
       }
     }
@@ -60,14 +60,14 @@ const renderers = {
       tmpPath = pushPath(path, keys[i])
 
       if (!tmpInfo) {
-        if (options.onError) options.onError('unrecognized key in conditional block', tmpPath, context)
+        options.onError('unrecognized key in conditional block', tmpPath, context)
         continue
       }
 
       if (tmpInfo.type === 'if') {
         // if statement should be first one
         if (i !== 0) {
-          if (options.onError) options.onError('extra if statement in conditional block', tmpPath, context)
+          options.onError('extra if statement in conditional block', tmpPath, context)
           continue
         }
         // if true
@@ -85,7 +85,7 @@ const renderers = {
         // else
         result = render(template[keys[i]], options, tmpPath, ctx)
       } else {
-        if (options.onError) options.onError('unrecognized key in conditional block', tmpPath, context)
+        options.onError('unrecognized key in conditional block', tmpPath, context)
       }
     }
 
@@ -102,7 +102,7 @@ const renderers = {
    * @returns {object} original template
    */
   elseif (template, options, path, ctx, tplInfo) {
-    if (options.onError) options.onError('elseif should behind if', pushPath(path, tplInfo.key), ctx.get())
+    options.onError('elseif should behind if', pushPath(path, tplInfo.key), ctx.get())
     return template
   },
   /**
@@ -116,7 +116,7 @@ const renderers = {
    * @returns {object} original template
    */
   else (template, options, path, ctx, tplInfo) {
-    if (options.onError) options.onError('else should behind if', pushPath(path, tplInfo.key), ctx.get())
+    options.onError('else should behind if', pushPath(path, tplInfo.key), ctx.get())
     return template
   },
   /**
@@ -130,28 +130,15 @@ const renderers = {
    * @returns {array} value
    */
   each (template, options, path, ctx, tplInfo) {
-    let arr = null
+    let data = null
     const res = []
     const context = ctx.get()
-
-    // get array data to iterate
-    try {
-      arr = evaluate(tplInfo.expression, context)
-      if (!Array.isArray(arr)) throw new Error('each statement should return an array')
-    } catch (e) {
-      if (options.onError) options.onError(e.message, path, context)
-      return res
-    }
-
-    // each data compile with same template
-    const newPath = pushPath(path, tplInfo.key)
-    arr.forEach((item, index) => {
-      // push item and $index to context
-      if (!isPlainObject(item)) {
-        if (options.onError) options.onError('data item in each should be plain object', newPath, context)
-        ctx.push({ $index: index })
+    const handler = (key, item) => {
+      // push ...item, $item and $index to context
+      if (isPlainObject(item)) {
+        ctx.push(Object.assign({ $key: key, $item: item }, item))
       } else {
-        ctx.push(Object.assign({ $index: index }, item))
+        ctx.push({ $key: key, $item: item })
       }
 
       const val = render(tplInfo.data, options, newPath, ctx)
@@ -159,7 +146,30 @@ const renderers = {
 
       // pop context
       ctx.pop()
-    })
+    }
+
+    // get data to iterate
+    try {
+      data = evaluate(tplInfo.expression, context)
+      if (!Array.isArray(data) && !isPlainObject(data)) throw new Error('each statement should return an array or plain object')
+    } catch (e) {
+      options.onError(e.message, path, context)
+      return res
+    }
+
+    // each data compile with same template
+    const newPath = pushPath(path, tplInfo.key)
+    // data is array
+    if (Array.isArray(data)) {
+      data.forEach((item, index) => {
+        handler(index, item)
+      })
+    // data is object
+    } else {
+      Object.keys(data).forEach(key => {
+        handler(key, data[key])
+      })
+    }
 
     return res
   },
@@ -176,7 +186,7 @@ const renderers = {
   concat (template, options, path, ctx, tplInfo) {
     const errmsg = validateConcat(tplInfo.data)
     if (errmsg) {
-      if (options.onError) options.onError(errmsg, pushPath(path, tplInfo.key), ctx.get())
+      options.onError(errmsg, pushPath(path, tplInfo.key), ctx.get())
       return null
     }
 
@@ -208,18 +218,18 @@ const renderers = {
   merge (template, options, path, ctx, tplInfo) {
     const errmsg = validateMerge(tplInfo.data)
     if (errmsg) {
-      if (options.onError) options.onError(errmsg, pushPath(path, tplInfo.key), ctx.get())
+      options.onError(errmsg, pushPath(path, tplInfo.key), ctx.get())
       return null
     }
 
     const res = {}
 
-    // merge eveny object in array
+    // merge every object in array
     tplInfo.data.forEach((item, index) => {
       const tmpPath = pushPath(path, tplInfo.key, index)
       const tmpData = render(item, options, tmpPath, ctx)
       if (!isPlainObject(tmpData)) {
-        if (options.onError) options.onError('item in merge block should be plain object', tmpPath, ctx.get())
+        options.onError('item in merge block should be plain object', tmpPath, ctx.get())
         return
       }
       Object.assign(res, tmpData)
@@ -240,7 +250,7 @@ const renderers = {
   let (template, options, path, ctx, tplInfo) {
     const errmsg = validateLet(tplInfo.data)
     if (errmsg) {
-      if (options.onError) options.onError(errmsg, pushPath(path, tplInfo.key), ctx.get())
+      options.onError(errmsg, pushPath(path, tplInfo.key), ctx.get())
       return null
     }
 
