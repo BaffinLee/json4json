@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>json4json - 👻 Json template for json</title>
+  <script src="https://raw.githubusercontent.com/BaffinLee/json4json/master/dist/json4json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/mode-javascript.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ext-language_tools.js"></script>
+  <style>
+    h1, h2, h3, p, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      padding-top: 40px;
+      padding-bottom: 20px;
+      box-sizing: border-box;
+      background: linear-gradient(to left bottom, hsl(47, 100%, 85%) 0%,hsl(96, 100%, 85%) 100%);
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC",
+              "Hiragino Sans GB", "Microsoft YaHei", Arial,
+              sans-serif;
+      font-size: 14px;
+      color: #555;
+    }
+
+    header, main {
+      width: 95%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .editor {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #eee;
+      background-color: #fffde5;
+      border-radius: 5px;
+      box-shadow: 0px 0px 20px 0px #b3b3b3;
+    }
+
+    .ace_scrollbar:hover::-webkit-scrollbar {
+      display: initial;
+    }
+
+    .ace_scrollbar::-webkit-scrollbar {
+      display: none;
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      z-index: 1000;
+    }
+
+    .ace_scrollbar::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    .ace_scrollbar::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .title {
+      font-weight: lighter;
+      line-height: 80px;
+    }
+
+    .title, .description, .links {
+      text-align: center;
+    }
+
+    .links {
+      margin-top: 20px;
+    }
+
+    .links a {
+      display: inline-block;
+      height: 24px;
+      min-width: 60px;
+      padding: 0 5px;
+      line-height: 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #fff;
+      background-color: #42b983;
+    }
+
+    .links a:hover {
+      background-color: #5fca99;
+    }
+
+    .live-demo {
+      display: flex;
+      margin-top: 20px;
+    }
+
+    .source, .result {
+      flex: 1 1 0;
+    }
+
+    .source {
+      margin-right: 30px;
+    }
+
+    .result .name,
+    .source .name {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .editor-result {
+      height: 658px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="title">json4json</h1>
+    <p class="description">👻 Json template for json</p>
+    <div class="links">
+      <a href="https://github.com/BaffinLee/json4json" target="_blank">Github</a>
+      <a href="https://github.com/BaffinLee/json4json#usage" target="_blank">Usage</a>
+      <a href="https://github.com/BaffinLee/json4json#api" target="_blank">Api</a>
+      <a href="https://github.com/BaffinLee/json4json#syntax" target="_blank">Syntax</a>
+    </div>
+  </header>
+  <main class="live-demo">
+    <div class="source">
+      <div class="name">Template</div>
+      <div class="editor" id="editor-template">{
+  simpleValue: '{{value}}',
+  optionalValue: '{{#? optionalValue}}',
+  iteration: {
+    object: {
+      '{{#each object}}': ['{{$key}}', '{{$item.example}}', '{{keyInItem}}']
+    },
+    array: {
+      '{{#each array}}': ['{{$key}}', '{{$item.example}}', '{{keyInItem}}']
+    }
+  },
+  conditions: {
+    '{{#if Math.round(num) === 10}}': 'if',
+    '{{#elseif $root.num > 10}}': 'elseif',
+    '{{#else}}': 'else'
+  },
+  mergeObjects: {
+    '{{#merge}}': [
+      { a: 1, b: 1, c: 1 },
+      { b: 2, c: 2 },
+      {
+        '{{#if false}}': {},
+        '{{#else}}': { c: 3 }
+      }
+    ]
+  },
+  concatArrays: {
+    '{{#concat}}': [
+      1,
+      [2, 3],
+      {
+        '{{#each array}}': '{{$key + 4}}'
+      },
+      5
+    ]
+  },
+  localVariables: {
+    '{{#let}}': [
+      {
+        var1: 'val5',
+        var2: 'val6'
+      },
+      ['{{var1}}', '{{var2}}']
+    ]
+  }
+}</div>
+    <div class="name">Data</div>
+    <div class="editor" id="editor-data">{
+  value: 'any value',
+  optionalValue: false,
+  object: {
+    key1: {
+      example: 'val1',
+      keyInItem: 'val2'
+    },
+  },
+  array: [
+    {
+      example: 'val3',
+      keyInItem: 'val4'
+    }
+  ],
+  num: 10.6
+}</div>
+    </div>
+    <div class="result">
+      <div class="name">Result</div>
+      <div class="editor editor-result" id="editor-result">{
+  "simpleValue": "any value",
+  "iteration": {
+    "object": [
+      [
+        "key1",
+        "val1",
+        "val2"
+      ]
+    ],
+    "array": [
+      [
+        0,
+        "val3",
+        "val4"
+      ]
+    ]
+  },
+  "conditions": "elseif",
+  "mergeObjects": {
+    "a": 1,
+    "b": 2,
+    "c": 3
+  },
+  "concatArrays": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "localVariables": [
+    "val5",
+    "val6"
+  ]
+}</div>
+    </div>
+  </main>
+  <script>
+    var templateEditor = getAceEditor('editor-template', false)
+    var dataEditor = getAceEditor('editor-data', false)
+    var resultEditor = getAceEditor('editor-result', true)
+
+    templateEditor.on('change', compile)
+    dataEditor.on('change', compile)
+
+    function getAceEditor (id, readOnly) {
+      var editor = window.ace.edit(id)
+      editor.setOptions({
+        behavioursEnabled: true,
+        highlightActiveLine: false,
+        autoScrollEditorIntoView: true,
+        readOnly: !!readOnly
+      })
+      editor.renderer.setOptions({
+        showPrintMargin: false,
+        fontSize: '14px',
+        showGutter: false
+      })
+      editor.session.setOptions({
+        tabSize: 2,
+        useWorker: true,
+        newLineMode: 'auto',
+        wrap: false
+      })
+      editor.setTheme('ace/theme/xcode')
+      editor.session.setMode(new (window.ace.require('ace/mode/javascript').Mode)())
+      return editor
+    }
+
+    function compile () {
+      var template = templateEditor.getValue().trim()
+      var data = dataEditor.getValue().trim()
+      try {
+        template = eval('(' + template + ')')
+        data = eval('(' + data + ')')
+      } catch (e) {
+        console.error('error occurs when eval code: ', e)
+        return
+      }
+      var result = json4json.transform(template, data, {
+        onError: function (message, path, context) {
+          console.error('error occurs when transform: ', message)
+          console.log('template path: ', path)
+          console.log('data context: ', context)
+        }
+      })
+      resultEditor.setValue(JSON.stringify(result, null, 2))
+      resultEditor.moveCursorTo(0, 0)
+    }
+  </script>
+</body>
+</html>
