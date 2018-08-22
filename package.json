@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "lint": "eslint src test index.js",
+    "build": "webpack --config build/build.js",
     "test": "npm run lint && nyc mocha --require intelli-espower-loader",
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
@@ -28,6 +29,10 @@
   "author": "Baffin Lee <BaffinLee@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-3": "^6.24.1",
     "codecov": "^3.0.4",
     "eslint": "^5.3.0",
     "eslint-config-standard": "^11.0.0",
@@ -38,7 +43,9 @@
     "intelli-espower-loader": "^1.0.1",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
-    "power-assert": "^1.6.0"
+    "power-assert": "^1.6.0",
+    "webpack": "^4.17.1",
+    "webpack-cli": "^3.1.0"
   },
   "engines": {
     "node": ">= 8"
