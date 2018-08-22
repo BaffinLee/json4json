@@ -11,6 +11,10 @@
 
 > Inspired by [st.js](https://github.com/SelectTransform/st.js)
 
+## Playground
+
+[https://baffinlee.github.io/json4json](https://baffinlee.github.io/json4json)
+
 ## Install
 
 ```bash
@@ -23,11 +27,26 @@ npm install json4json
 
 ### general
 
+> need Node.js >= 8
+
 ```javascript
 const { transform } = require('json4json')
 const template = '{{val}}'
 const data = {val: 1}
 const result = transform(template, data) // 1
+```
+
+### in web browser
+
+> need `Symbol` and `new Function` support
+
+```html
+<script src="./dist/json4json.min.js"></script>
+<script>
+  const template = '{{val}}'
+  const data = {val: 1}
+  const result = json4json.transform(template, data) // 1
+</script>
 ```
 
 ### full example
@@ -128,7 +147,7 @@ result = {
 
 params:
 
-- `template` {object | string}
+- `template` {object | array | string}
 - `data` {object} optional
 - `options` {object} optional
 - `options.onError` {function} optional, error handler
@@ -143,17 +162,13 @@ return:
 
 - {any}
 
-## Playground
-
-[https://baffinlee.github.io/json4json](https://baffinlee.github.io/json4json)
-
 ## Syntax
 
 > `$root` in the bottom of context represents the root data (object)
 
 ### value
 
-`{{var}}` => string
+`{{var}}` => any
 
 example:
 
@@ -166,7 +181,7 @@ transform({ '{{key}}': 1 }, data) // {1: '1'}
 
 ### optional value
 
-`{{#? var}}` => string | empty | null
+`{{#? var}}` => any | empty | null
 
 example:
 
