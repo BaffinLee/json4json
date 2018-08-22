@@ -13,7 +13,7 @@
 
 ## Playground
 
-[https://baffinlee.github.io/json4json](https://baffinlee.github.io/json4json)
+[https://baffinlee.github.io/json4json/](https://baffinlee.github.io/json4json/)
 
 ## Install
 
