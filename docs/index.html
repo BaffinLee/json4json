@@ -98,6 +98,7 @@
     .live-demo {
       display: flex;
       margin-top: 20px;
+      flex-wrap: wrap;
     }
 
     .source, .result {
@@ -116,6 +117,15 @@
 
     .editor-result {
       height: 658px;
+    }
+
+    @media screen and (max-width: 680px) {
+      .source, .result {
+        flex: 0 0 100%;
+      }
+      .source {
+        margin-right: 0;
+      }
     }
   </style>
 </head>
