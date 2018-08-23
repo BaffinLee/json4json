@@ -1,5 +1,8 @@
-const STACK = Symbol.for('Context.STACK')
-const CTX = Symbol.for('Context.CTX')
+const symbolSupport = typeof Symbol !== 'undefined'
+/* istanbul ignore next */
+const STACK = symbolSupport ? Symbol('Context.STACK') : '__STACK__'
+/* istanbul ignore next */
+const CTX = symbolSupport ? Symbol('Context.CTX') : '__CTX__'
 
 /**
  * context

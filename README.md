@@ -38,7 +38,7 @@ const result = transform(template, data) // 1
 
 ### in web browser
 
-> need `Symbol` and `new Function` support
+> need `new Function` support
 
 ```html
 <script src="./dist/json4json.min.js"></script>

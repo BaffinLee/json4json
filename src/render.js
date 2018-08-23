@@ -2,7 +2,10 @@ const { detect, detectValue, detectBlock } = require('./detect')
 const { pushPath, isPlainObject } = require('./utils')
 const { validateLet, validateMerge, validateConcat } = require('./validate')
 const evaluate = require('./evaluate')
-const dropOptionalValue = Symbol.for('render.dropOptionalValue')
+/* istanbul ignore next */
+const dropOptionalValue = typeof Symbol !== 'undefined'
+  ? Symbol('render.dropOptionalValue')
+  : { desc: 'special object represents drop optional value' }
 const renderers = {
   /**
    * value renderer
